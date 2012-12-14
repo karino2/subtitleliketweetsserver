@@ -1,3 +1,5 @@
+
+
 var g_test_srt = [{"status":0,"srtTitle":"Introduction : Why Study Algorithms ? (19 min)","srtUrl":"http://www.universalsubtitles.org/ja/videos/k2a8e2xr7tsj/info/introduction-why-study-algorithms-19-min/","_docId":"Z85bK7NOReJC4IMdexqqZmLaQ00NPbWr","_updatedAt":1354703848538,"_createdAt":1354703848538},
 {"status":0,"srtTitle":"Merge Sort: Motivation and Example (9 min)","srtUrl":"http://www.universalsubtitles.org/ja/videos/avBZEWDq01QU/info/merge-sort-motivation-and-example-9-min/","_docId":"sD1KB9spqUKyzf7mgxCSeoQMk4sDGpGX","_updatedAt":1355124214568,"_createdAt":1355124214568},
 {"status":0,"srtTitle":"Lecture 6b: Test/Re-test Reliability Analysis in R (13:58)","srtUrl":"http://www.universalsubtitles.org/ja/videos/FkjN0yIA5wgK/info/lecture-6b-testre-test-reliability-analysis-in-r-1358/","_docId":"ts00LxqhfHMqaG6IxGj9HUQIxUYyPjpd","_updatedAt":1355124630594,"_createdAt":1355124630594}]

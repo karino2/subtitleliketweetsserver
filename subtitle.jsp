@@ -18,6 +18,12 @@
 var g_user = "<%= user.getEmail() %>";
 </script>
 
+<!-- 
+	************************************************************
+	********* below here is the same as jsp version. ***********
+	************************************************************
+-->
+
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
@@ -27,6 +33,7 @@ function isLocal() {
 
 function ajaxPost(url, param, onSuccess, postType){
    if(isLocal()) {
+	   return dummyPost(url, param, onSuccess, postType);
    } else {
 	   return $.post(url, param, onSuccess, postType);
    }
@@ -34,25 +41,15 @@ function ajaxPost(url, param, onSuccess, postType){
 
 function ajaxGet(url, onSuccess){
 	if(isLocal()) {
+		dummyGet(url, onSuccess);
 	} else {
 		$.get(url, onSuccess);
 	}
 }
 
-/*
-	$.ajax({
-		type: 'POST',
-		url: "/_je/areaMap",
-		data: jsonparam,
-		dataType: 'json',
-		success: function (result){
-			notifyStatus("release area done");
-		},
-		async: !sync
-		});
-*/
 function ajaxGeneral(param) {
 	if(isLocal()) {
+		dummyAjax(param);
 	} else {
 		$.ajax(param);
 	}
@@ -60,10 +57,12 @@ function ajaxGeneral(param) {
 
 
 
-
-$(function() {
+function onJqueryReady() {
+	$(window).unload(function() {
+		freeArea(g_areaIndex, true);
+	});
 	getSrts();
-});
+}
 
 var TEXT_PER_AREA =20;
 
@@ -350,14 +349,11 @@ function onChangeSrt() {
 	btnStartEnable(true);
 }
 
-$(window).unload(function() {
-	freeArea(g_areaIndex, true);
-});
 
 </script>
 </head>
 
-<body>
+<body onload="onJqueryReady()">
 <h1>Subtitles</h1>
 終わる時はこれ押して下さい。　<input id="btnReleaseArea" type="button" onclick="onFreeClick()" disabled value="release area"><br>
 <select onchange="onChangeSrt()" id="srtList"></select> <input id="btnSrtChoose" type="button" value="start" disabled onclick="onChoose()"> <span id="status">status</span> <input id="btnJump" type="button" value="Jump" disabled onclick="onJump()">
