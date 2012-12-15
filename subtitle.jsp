@@ -227,7 +227,7 @@ function onTextsComming(result) {
 		div.attr("_docId", texts[i]._docId);
 		var target = $('<textarea />').addClass("target").css("width", "40%").val(texts[i].target);
 		var original = $('<textarea />').addClass("original").css("width", "40%").val(texts[i].original);
-		var submit = $('<input type="button" />').val("S").click(function() {
+		var submit = $('<a href="javascript:void(0)" class="btn"><i class="icon-ok"></i></a>').click(function() {
 			var par =$(this).parent();				
 			submitText(par.attr("_docId"), par.find(".target").val());
 		});
