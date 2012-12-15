@@ -11,6 +11,15 @@
 body {
   padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
+
+textarea {
+  width: 100%;
+}
+
+#subtitleHolder {
+  padding-top: 30px;
+}
+
 </style>
 <title>BBS sample by jsonengine</title>
 <%
@@ -223,17 +232,17 @@ function onTextsComming(result) {
 	var holder = $('#subtitleHolder');
 	holder.empty();
 	for(var i = 0; i <texts.length; i++){
-		var div = $('<div/>');
+		var div = $('<div/>').addClass("row");
 		div.attr("_docId", texts[i]._docId);
-		var target = $('<textarea />').addClass("target").css("width", "40%").val(texts[i].target);
-		var original = $('<textarea />').addClass("original").css("width", "40%").val(texts[i].original);
+		var target = $('<div/>').addClass("span5").append($('<textarea />').addClass("target").val(texts[i].target));
+		var original = $('<div/>').addClass("span5").append($('<textarea />').addClass("original").val(texts[i].original));
 		var submit = $('<a href="javascript:void(0)" class="btn"><i class="icon-ok"></i></a>').click(function() {
 			var par =$(this).parent();				
 			submitText(par.attr("_docId"), par.find(".target").val());
 		});
 		div.append(target);
 		div.append(original);
-		div.append(submit);
+		div.append($('<div/>').addClass("span2").append(submit));
 		holder.append(div);
 	}
 }
@@ -272,7 +281,9 @@ function findEmptyIndex(avoidId){
 }
 
 function notifyStatus(msg){
-	$("#status").text(msg);
+	if (console) {
+		console.log(msg);        
+	}
 }
 
 function onFreeClick() {
@@ -385,7 +396,7 @@ function onChangeSrt() {
     <select class="span5" onchange="onChangeSrt()" id="srtList"></select>
     <input id="btnSrtChoose" class="btn" type="button" value="start" disabled onclick="onChoose()">
   </div>
-  <span id="status">status</span> <input id="btnJump" type="button" class="btn" value="Jump" disabled onclick="onJump()">
+  <input id="btnJump" type="button" class="btn" value="Jump" disabled onclick="onJump()">
   <div id="subtitleHolder">
   </div>
   <hr>
