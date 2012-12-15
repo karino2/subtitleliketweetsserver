@@ -1,6 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+<style>
+body {
+  padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+}
+</style>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>BBS sample by jsonengine</title>
 <!-- this is only for html -->
@@ -401,12 +407,36 @@ function onChangeSrt() {
 </head>
 
 <body onload="onJqueryReady()">
-<h1>Subtitles</h1>
-終わる時はこれ押して下さい。　<input id="btnReleaseArea" type="button" onclick="onFreeClick()" disabled value="release area"><br>
-<select onchange="onChangeSrt()" id="srtList"></select> <input id="btnSrtChoose" type="button" value="start" disabled onclick="onChoose()"> <span id="status">status</span> <input id="btnJump" type="button" value="Jump" disabled onclick="onJump()">
-<div id="subtitleHolder">
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">Subtitles</a>
+      <div class="nav-collapse collapse">
+        <ul class="nav">
+          <li class="active"><a href="/">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
 </div>
-<hr>
+<div class="container">
+  <input id="btnReleaseArea" type="button" onclick="onFreeClick()" disabled value="release area" class="pull-right btn btn-primary">
+  <div class="input-append">
+    <select class="span5" onchange="onChangeSrt()" id="srtList"></select>
+    <input id="btnSrtChoose" class="btn" type="button" value="start" disabled onclick="onChoose()">
+  </div>
+  <span id="status">status</span> <input id="btnJump" type="button" class="btn" value="Jump" disabled onclick="onJump()">
+  <div id="subtitleHolder">
+  </div>
+  <hr>
+</div>
 </body>
 
 </html>
