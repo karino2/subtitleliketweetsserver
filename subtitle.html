@@ -328,7 +328,9 @@ function findEmptyIndex(avoidId){
 }
 
 function notifyStatus(msg){
-	$("#status").text(msg);
+	if (console) {
+		console.log(msg);        
+	}
 }
 
 function onFreeClick() {
@@ -441,7 +443,7 @@ function onChangeSrt() {
     <select class="span5" onchange="onChangeSrt()" id="srtList"></select>
     <input id="btnSrtChoose" class="btn" type="button" value="start" disabled onclick="onChoose()">
   </div>
-  <span id="status">status</span> <input id="btnJump" type="button" class="btn" value="Jump" disabled onclick="onJump()">
+  <input id="btnJump" type="button" class="btn" value="Jump" disabled onclick="onJump()">
   <div id="subtitleHolder">
   </div>
   <hr>
