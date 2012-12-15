@@ -17,7 +17,7 @@ textarea {
 }
 
 #subtitleHolder {
-  padding-top: 30px;
+  padding-top: 10px;
 }
 
 </style>
@@ -231,6 +231,7 @@ function onTextsComming(result) {
 	var bldr = [];
 	var holder = $('#subtitleHolder');
 	holder.empty();
+	holder.append($('<ul class="pager"><li class="next"><a id="btnJump" href="javascript:void(0)" disabled onclick="onJump()">別の場所を翻訳 &rarr;</a></li></ul>'));
 	for(var i = 0; i <texts.length; i++){
 		var div = $('<div/>').addClass("row");
 		div.attr("_docId", texts[i]._docId);
@@ -396,7 +397,6 @@ function onChangeSrt() {
     <select class="span5" onchange="onChangeSrt()" id="srtList"></select>
     <input id="btnSrtChoose" class="btn" type="button" value="start" disabled onclick="onChoose()">
   </div>
-  <input id="btnJump" type="button" class="btn" value="Jump" disabled onclick="onJump()">
   <div id="subtitleHolder">
   </div>
   <hr>
