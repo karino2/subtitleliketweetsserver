@@ -202,8 +202,8 @@ function onJump() {
 function submitText(docId, targetText) {
 	var obj = {target: targetText, _docId: docId};
 	notifyStatus("submitting...");
-	var jsonparam = { _doc: JSON.stringify(obj) };	
-
+	var jsonparam = { _doc: JSON.stringify(obj) };
+	
 	ajaxPost("/_je/text", jsonparam, function (result){
 		notifyStatus("submit done.");
 	}, "json");
@@ -238,7 +238,7 @@ function onTextsComming(result) {
 		var target = $('<div/>').addClass("span5").append($('<textarea />').addClass("target").val(texts[i].target));
 		var original = $('<div/>').addClass("span5").append($('<textarea />').addClass("original").val(texts[i].original));
 		var submit = $('<a href="javascript:void(0)" class="btn"><i class="icon-ok"></i></a>').click(function() {
-			var par =$(this).parent();				
+			var par =$(this).parent().parent();				
 			submitText(par.attr("_docId"), par.find(".target").val());
 		});
 		div.append(target);
