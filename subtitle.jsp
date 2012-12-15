@@ -21,7 +21,7 @@ textarea {
 }
 
 </style>
-<title>BBS sample by jsonengine</title>
+<title>つぶやくようにCoursera和訳 web Ver.</title>
 <%
     UserService userService = UserServiceFactory.getUserService();
     User user = userService.getCurrentUser();
@@ -380,18 +380,17 @@ function onChangeSrt() {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </a>
-      <a class="brand" href="#">Subtitles</a>
       <div class="nav-collapse collapse">
         <ul class="nav">
-          <li class="active"><a href="/">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li class="active"><a href="#home">Home</a></li>
+          <li><a href="stats.html">Stats</a></li>
+          <li><a href="notice.html">Notice</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
   </div>
 </div>
-<div class="container">
+<div class="container" id="homeDiv">
   <input id="btnReleaseArea" type="button" onclick="onFreeClick()" disabled value="release area" class="pull-right btn btn-primary">
   <div class="input-append">
     <select class="span5" onchange="onChangeSrt()" id="srtList"></select>
