@@ -1,78 +1,21 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.google.appengine.api.users.User" %>
+<%@ page import="com.google.appengine.api.users.UserService" %>
+<%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<!-- this is only for html -->
+<%
+    UserService userService = UserServiceFactory.getUserService();
+    User user = userService.getCurrentUser();
+    if (user == null) {
+		response.sendRedirect(userService.createLoginURL(request.getRequestURI()));
+	}
+%>
 <script type="text/javascript">
-var g_user = "hogeika2@gmail.com";
-
-function filterByTextId(region, texts){
-	var res =[];
-	for(var i =0; i <texts.length; i++) {
-		if(texts[i].textId >= region.begin && texts[i].textId <= region.end) {
-			res.push(texts[i]);
-		}
-	}
-	return res;
-}
-
-function filterBySrtId(srtId, texts){
-	var res =[];
-	for(var i =0; i <texts.length; i++) {
-		if(texts[i].srtId == srtId) {
-			res.push(texts[i]);
-		}
-	}
-	return res;
-}
-
-// /* "/_je/text?cond=textId.ge." + region.begin +"&cond=textId.le." */
-// /* "/_je/text?cond=textId.ge.1&cond=textId.le.20" */
-function getRegion(url){
-	var reg =url.match(/cond=textId.ge.(\d*)&cond=textId.le.(\d*)/);
-	return { begin: parseInt(reg[1]), end:parseInt(reg[2]) };
-}
-
-function getSrtId(url){
-	var srtIds =url.match(/cond=srtId.eq.(.*)/);
-	return srtIds[1];
-}
-
-function dummyGet(url, onSuccess){
-	var res;
-	if(url == "/_je/areaMap"){
-		res = g_test_areaMap;
-	} else if(url == "/_je/srt") {
-		res = g_test_srt;
-	} else { // "/_je/text?cond=srtId.eq.xxxx"
-		var srtId =getSrtId(url);
-		res = filterBySrtId(srtId, g_test_text);
-	}
-	/*
-	} else { // "/_je/text?cond=textId.ge." + region.begin +"&cond=textId.le." 
-		region =getRegion(url);
-		res = filterByTextId(region, g_test_text);
-	}
-	*/
-	window.setTimeout(function(){onSuccess(res); }, 100);
-}
-
-function dummyPost(url, param, onSuccess, postType){
-	// only "/_je/text" now.
-	window.setTimeout(function() {onSuccess(); }, 100);
-}
-
-function dummyAjax(param) {
-	// only areamap Free.
-	if(param.async) {
-		setTimeout(function(){ param.success(); }, 100);
-	} else {
-		param.success();
-	}
-}
-
+var g_user = "<%= user.getEmail() %>";
 </script>
-<script src="testdata/testdata.js" type="text/javascript"></script>
 <!-- 
 	************************************************************
 	********* below here is the same as jsp version. ***********
