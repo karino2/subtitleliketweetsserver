@@ -216,6 +216,7 @@ function filterSrtId(texts, srtId){
 }
 
 function onJump() {
+	notifyStatus("network...", STATUS_STICK);
 	updateAreaMapAndSetupAreaAndTexts();
 }
 
@@ -230,9 +231,13 @@ function submitText(docId, targetText, onAfter) {
 	}, "json");
 }
 
+function isInsideArea(text) {
+	return !isOutsideArea(text);
+}
+
 function isReallyEmpty(texts){
 	for(var i =0; i < texts.length; i++) {
-		if(texts[i].target == "")
+		if(texts[i].target == "" && isInsideArea(texts[i]))
 			return true;
 	}
 	return false;
@@ -309,6 +314,7 @@ function setupAreaAndTexts() {
 	var region = areaIndexToRegionWithHeaderFooter(g_areaIndex);
 	ajaxGet("/_je/text?cond=textId.ge." + region.begin +"&cond=textId.le."+ region.end, function (result) {
 		onTextsComming(result);
+		notifyStatus("done", STATUS_TIMED);
 	});
 
 }
