@@ -6,22 +6,6 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
-<style>
-body {
-  padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-}
-
-textarea {
-  width: 100%;
-}
-
-#subtitleHolder {
-  padding-top: 10px;
-}
-
-</style>
-<title>つぶやくようにCoursera和訳 web Ver.</title>
 <%
     UserService userService = UserServiceFactory.getUserService();
     User user = userService.getCurrentUser();
@@ -38,7 +22,29 @@ var g_user = "<%= user.getEmail() %>";
 	********* below here is the same as jsp version. ***********
 	************************************************************
 -->
+<link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+<style>
+body {
+  padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+}
 
+textarea {
+  width: 100%;
+}
+
+#subtitleHolder {
+  padding-top: 10px;
+}
+
+div.status {
+  display: none;
+  position: fixed;
+  right: 40px;
+  top: 50px;
+}
+
+</style>
+<title>つぶやくようにCoursera和訳 web Ver.</title>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
@@ -76,6 +82,7 @@ function onJqueryReady() {
 	$(window).unload(function() {
 		freeArea(g_areaIndex, true);
 	});
+	notifyStatus("setup...", STATUS_STICK);
 	getSrts();
 }
 
@@ -155,6 +162,7 @@ function btnStartEnable(isEnable) {
 }
 
 function onChoose() {
+	notifyStatus("connecting...", STATUS_STICK);
 	if(g_areaIndex != -1){
 		freeArea(g_areaIndex, true);
 		g_areaIndex = -1;
@@ -201,11 +209,11 @@ function onJump() {
 
 function submitText(docId, targetText) {
 	var obj = {target: targetText, _docId: docId};
-	notifyStatus("submitting...");
-	var jsonparam = { _doc: JSON.stringify(obj) };
-	
+	notifyStatus("submitting...", STATUS_STICK);
+	var jsonparam = { _doc: JSON.stringify(obj) };	
+
 	ajaxPost("/_je/text", jsonparam, function (result){
-		notifyStatus("submit done.");
+		notifyStatus("submit done.", STATUS_TIMED);
 	}, "json");
 }
 
@@ -244,14 +252,15 @@ function onTextsComming(result) {
 		div.append(target);
 		div.append(original);
 		div.append($('<div/>').addClass("span2").append(submit));
-		holder.append(div);
+		holder.append(div);		
 	}
+	notifyStatus("", STATUS_HIDE);
 }
 
 function setupAreaAndTexts() {
 	var id =findEmptyIndex(g_areaIndex);	
 	if(id == -1) {
-		alert("TODO: area full");
+		notifyStatus("TODO: area full", STATUS_STICK);
 		return;
 	}
 	freeArea(g_areaIndex, true);
@@ -259,7 +268,7 @@ function setupAreaAndTexts() {
 	g_areaIndex = id;
 	enableAreaRelatedButton(true);
 
-	notifyStatus("retrieve texts");
+	debugLog("retrieve texts");
 	var region = areaIndexToRegion(g_areaIndex);
 	ajaxGet("/_je/text?cond=textId.ge." + region.begin +"&cond=textId.le."+ region.end, function (result) {
 		onTextsComming(result);
@@ -281,9 +290,43 @@ function findEmptyIndex(avoidId){
    return -1;
 }
 
-function notifyStatus(msg){
+function debugLog(msg){
 	if (console) {
 		console.log(msg);        
+	}
+}
+
+var STATUS_STICK =1;
+var STATUS_TIMED =2;
+var STATUS_HIDE =3;
+var g_status = STATUS_HIDE;
+
+function notifyDone() {
+	if(g_status == STATUS_TIMED){
+		$("div.status").fadeOut(1000);
+		g_status =STATUS_HIDE
+	}
+}
+
+function notifyWaitLong() {
+	setTimeout(notifyDone, 1000);
+}
+
+function notifyStatus(msg, typ){
+	$("div.status").html(msg);
+	if(typ == STATUS_STICK) {
+		g_status = STATUS_STICK;
+		$("div.status").html(msg).fadeIn(1000);
+		return;
+	}
+	if(typ == STATUS_TIMED) {
+		g_status = STATUS_TIMED;
+		$("div.status").html(msg).fadeIn(1000, notifyWaitLong);
+		return;
+	}
+	if(typ == STATUS_HIDE){
+		g_status = STATUS_HIDE;
+		$("div.status").fadeOut(1000);
 	}
 }
 
@@ -308,7 +351,7 @@ function updateArea(areaIndex, success, sync){
 		data: jsonparam,
 		dataType: 'json',
 		success: function (result){
-			notifyStatus("release area done");
+			debugLog("release area done");
 		},
 		async: !sync
 		});
@@ -320,7 +363,7 @@ function freeArea(id, sync) {
 	}
 	g_areaMap.unbook(id);
 	updateArea(id, function (result){
-			notifyStatus("release area done");
+			debugLog("release area done");
 		}, sync);
 }
 
@@ -334,16 +377,16 @@ function changeDone(areaIndex) {
 function bookArea(id){
 	g_areaMap.book(id);
 	updateArea(id, function (result){
-		notifyStatus("book done");
+		debugLog("book done");
 		});
 	
 }
 
 function getSrts(){
- notifyStatus("get srts...");
+ debugLog("get srts...");
  // var BASE = "http://subtitleliketweets.appspot.com";
  ajaxGet("/_je/srt", function (result) {
-    notifyStatus("get srts done");
+    notifyStatus("", STATUS_HIDE);
 	var sel = $('#srtList');
 	for(var i = 0; i <result.length; i++){
 		sel.append($('<option>').attr({value: result[i]._docId}).text(result[i].srtTitle));
@@ -390,6 +433,7 @@ function onChangeSrt() {
     </div>
   </div>
 </div>
+<div class="status label label-info">status</div>
 <div class="container" id="homeDiv">
   <input id="btnReleaseArea" type="button" onclick="onFreeClick()" disabled value="release area" class="pull-right btn btn-primary">
   <div class="input-append">
