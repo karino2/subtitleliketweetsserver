@@ -347,6 +347,7 @@ function onFreeClick() {
 	g_areaIndex = -1;
 	enableAreaRelatedButton(false);
 	btnStartEnable(true);
+	$('#subtitleHolder').empty();	
 }
 
 var g_deb;
