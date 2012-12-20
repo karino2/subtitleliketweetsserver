@@ -231,6 +231,18 @@ function areaIndexToRegion(areaIndex){
 	return {begin: 1+(areaIndex-1)*TEXT_PER_AREA, end: areaIndex*TEXT_PER_AREA }
 }
 
+function areaIndexToRegionWithHeaderFooter(areaIndex){
+	if(areaIndex == 1) {
+		return {begin: 1, end: (2+areaIndex*TEXT_PER_AREA) }	
+	}
+	return {begin: -1+(areaIndex-1)*TEXT_PER_AREA, end: 2+areaIndex*TEXT_PER_AREA }
+}
+
+function isOutsideArea(text) {
+	var region = areaIndexToRegion(g_areaIndex);
+	return (text.textId < region.begin) || (text.textId > region.end);
+}
+
 function shuffle(begin, end) {
 	var ind = [];
 	for(var i =begin; i <=end; i++) {
@@ -283,6 +295,8 @@ function onTextAreaChange() {
 		$(this).addClass("dirty");
 }
 
+
+
 function onTextsComming(result) {
 	var texts = filterSrtId(result, g_srtId);
 	if(!isReallyEmpty(texts)) {
@@ -291,6 +305,7 @@ function onTextsComming(result) {
 		setupAreaAndTexts();
 		return;
 	}
+	texts.sort(function(a, b) { if(a.textId > b.textId) return 1; if(a.textId < b.textId) return -1; return 0; });
 	
 	
 	var bldr = [];
@@ -300,8 +315,14 @@ function onTextsComming(result) {
 	for(var i = 0; i <texts.length; i++){
 		var div = $('<div/>').addClass("row");
 		div.attr("_docId", texts[i]._docId);
-		var target = $('<div/>').addClass("span5").append($('<textarea />').addClass("target").val(texts[i].target).change(onTextAreaChange).attr("_server", texts[i].target));
-		var original = $('<div/>').addClass("span5").append($('<textarea />').addClass("original").val(texts[i].original));
+		var targetTextArea = $('<textarea />').addClass("target").val(texts[i].target).attr("_server", texts[i].target);
+		if(isOutsideArea(texts[i])){
+			 targetTextArea.attr("disabled", "disabled");
+		} else {
+			 targetTextArea.change(onTextAreaChange);
+		}
+		var target = $('<div/>').addClass("span5").append(targetTextArea);
+		var original = $('<div/>').addClass("span5").append($('<textarea />').addClass("original").val(texts[i].original).attr("disabled", "disabled"));
 		var submit = $('<a href="javascript:void(0)" class="btn"><i class="icon-ok"></i></a>').click(function() {
 			var par =$(this).parent().parent();
 			var targetTextArea = par.find(".target");
@@ -328,7 +349,7 @@ function setupAreaAndTexts() {
 	enableAreaRelatedButton(true);
 
 	debugLog("retrieve texts");
-	var region = areaIndexToRegion(g_areaIndex);
+	var region = areaIndexToRegionWithHeaderFooter(g_areaIndex);
 	ajaxGet("/_je/text?cond=textId.ge." + region.begin +"&cond=textId.le."+ region.end, function (result) {
 		onTextsComming(result);
 	});
