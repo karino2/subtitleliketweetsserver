@@ -32,6 +32,10 @@ textarea {
   width: 100%;
 }
 
+textarea.dirty {
+  background-color: #996666;
+}
+
 #subtitleHolder {
   padding-top: 10px;
 }
@@ -207,12 +211,13 @@ function onJump() {
 	setupAreaAndTexts();
 }
 
-function submitText(docId, targetText) {
+function submitText(docId, targetText, onAfter) {
 	var obj = {target: targetText, _docId: docId};
 	notifyStatus("submitting...", STATUS_STICK);
 	var jsonparam = { _doc: JSON.stringify(obj) };	
 
 	ajaxPost("/_je/text", jsonparam, function (result){
+		onAfter();
 		notifyStatus("submit done.", STATUS_TIMED);
 	}, "json");
 }
@@ -225,6 +230,11 @@ function isReallyEmpty(texts){
 	return false;
 }
 
+function onTextAreaChange() {
+	var tarea = $(this);
+	if(tarea.val() != tarea.attr("_server"))
+		$(this).addClass("dirty");
+}
 
 function onTextsComming(result) {
 	var texts = filterSrtId(result, g_srtId);
@@ -243,11 +253,13 @@ function onTextsComming(result) {
 	for(var i = 0; i <texts.length; i++){
 		var div = $('<div/>').addClass("row");
 		div.attr("_docId", texts[i]._docId);
-		var target = $('<div/>').addClass("span5").append($('<textarea />').addClass("target").val(texts[i].target));
+		var target = $('<div/>').addClass("span5").append($('<textarea />').addClass("target").val(texts[i].target).change(onTextAreaChange).attr("_server", texts[i].target));
 		var original = $('<div/>').addClass("span5").append($('<textarea />').addClass("original").val(texts[i].original));
 		var submit = $('<a href="javascript:void(0)" class="btn"><i class="icon-ok"></i></a>').click(function() {
-			var par =$(this).parent().parent();				
-			submitText(par.attr("_docId"), par.find(".target").val());
+			var par =$(this).parent().parent();
+			var targetTextArea = par.find(".target");
+			var newVal =targetTextArea.val();
+			submitText(par.attr("_docId"), par.find(".target").val(), function() {targetTextArea.attr("_server", newVal); targetTextArea.removeClass("dirty"); });
 		});
 		div.append(target);
 		div.append(original);
