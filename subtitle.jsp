@@ -173,11 +173,7 @@ function onChoose() {
 	}
 	btnStartEnable(false);
 	g_srtId =$('#srtList option:selected')[0].value;
-	ajaxGet("/_je/areaMap", function (result) {
-		g_areaMapList =createAreaMapList(result);
-		g_areaMap = g_areaMapList.getMap(g_srtId);
-		setupAreaAndTexts();
-	 });
+	updateAreaMapAndSetupAreaAndTexts();
 }
 
 function areaIndexToRegion(areaIndex){
@@ -220,7 +216,7 @@ function filterSrtId(texts, srtId){
 }
 
 function onJump() {
-	setupAreaAndTexts();
+	updateAreaMapAndSetupAreaAndTexts();
 }
 
 function submitText(docId, targetText, onAfter) {
@@ -255,7 +251,7 @@ function onTextsComming(result) {
 	if(!isReallyEmpty(texts)) {
 		changeDone(g_areaIndex);
 		g_areaIndex = -1;
-		setupAreaAndTexts();
+		updateAreaMapAndSetupAreaAndTexts();
 		return;
 	}
 	texts.sort(function(a, b) { if(a.textId > b.textId) return 1; if(a.textId < b.textId) return -1; return 0; });
@@ -288,6 +284,14 @@ function onTextsComming(result) {
 		holder.append(div);		
 	}
 	notifyStatus("", STATUS_HIDE);
+}
+
+function updateAreaMapAndSetupAreaAndTexts() {
+	ajaxGet("/_je/areaMap", function (result) {
+		g_areaMapList =createAreaMapList(result);
+		g_areaMap = g_areaMapList.getMap(g_srtId);
+		setupAreaAndTexts();
+	 });
 }
 
 function setupAreaAndTexts() {
