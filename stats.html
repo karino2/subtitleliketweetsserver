@@ -58,7 +58,7 @@ function dummyGet(url, onSuccess){
 }
 
 function dummyPost(url, param, onSuccess, postType){
-	// only "/_je/text" now.
+	// only areaMap now.
 	window.setTimeout(function() {onSuccess(); }, 100);
 }
 
@@ -135,22 +135,141 @@ function ajaxGeneral(param) {
 	}
 }
 
+var TEXT_PER_AREA =20;
+
+function createAreaMap(json){ 
+   return {
+       getSrtId: function() {return json["srtId"]; },
+	   getDocId: function() {return json["_docId"]; },
+	   getArea: function(idx){ return json["a"+idx] },
+	   isMine: function(idx) {
+	       var area = this.getArea(idx);
+			if(area[1] == g_user)
+				return true;
+			return false;
+		},
+	   isEmpty: function(idx){
+	       var area = this.getArea(idx);
+		   if(area[0] == "e")
+				return true;
+			if(area[1] == g_user)
+				return true;
+			var now = (new Date()).getTime();
+			if(now - area[2] > 60*60*1000)
+				return true;
+			return false;
+		},
+		unbook: function(idx) {
+			var area =this.getArea(idx);
+			area[0] = "e";
+			area[1] = "";
+			area[2] = (new Date()).getTime();
+		},
+		book: function(idx){
+			var area =this.getArea(idx);
+			area[0] = "a";
+			area[1] =g_user;
+			area[2] = (new Date()).getTime();
+		},
+		setDone: function(idx){
+			var area =this.getArea(idx);
+			area[0] = "d";
+			area[1] = "";
+			area[2] = (new Date()).getTime();
+		},
+		getTextNum: function() { return json["textNum"]; },
+		getAreaNum: function() {
+			return 1+ Math.floor((this.getTextNum()-1) / TEXT_PER_AREA);
+		},
+		lastAreaTextNum: function() {
+			return this.getTextNum() % TEXT_PER_AREA;
+		},
+		areaRegion: function(areaIndex) {
+			var firstAreaIndex = 1+(areaIndex-1)*TEXT_PER_AREA;
+			var lastAreaIndex = this.getAreaNum();
+			if(areaIndex == lastAreaIndex) {
+				return {begin: firstAreaIndex, end: this.lastAreaTextNum() };
+			}
+			return {begin: firstAreaIndex, end: firstAreaIndex-1+TEXT_PER_AREA};
+		},
+   };
+}
+
+function createAreaMapList(jsons){
+   return {
+      getMap: function(srtId){
+		  for(var i =0; i < jsons.length; i++){
+		      if(jsons[i].srtId ==srtId)
+			      return createAreaMap(jsons[i]);
+		  }
+		  return undefined;
+	  }, 
+	  getLength: function() {return jsons.length; }
+	  };
+}
+
+var g_areaMapList;
+var g_areaMap;
+
+function calcComps(texts, region) {
+	var comp = 0;
+	for(var idx =region.begin; idx <=region.end; idx++) {
+		var text = texts[idx-1];
+		if(text.target != "")
+			comp++;
+	}
+	return comp;
+}
+
+function calcStats(texts, areaMap) {
+	var textNum =areaMap.getTextNum();
+	var now = (new Date()).getTime();
+	var stats = {d: now, a:[]};
+	var lastArea = areaMap.getAreaNum();
+	var comp;
+	for(var i = 1; i <= lastArea; i++) {
+		comp = calcComps(texts, areaMap.areaRegion(i));
+		stats.a[i] =comp;
+	}
+	return stats;
+}
+
 function onTextsComming(texts){
+	texts.sort(function(a, b) { if(a.textId > b.textId) return 1; if(a.textId < b.textId) return -1; return 0; });
+	
+	var stats = calcStats(texts, g_areaMap);
+	var obj = {s: stats, _docId: g_areaMap.getDocId()};
+	var jsonparam = { _doc: JSON.stringify(obj) };	
+
+	ajaxPost("/_je/areaMap", jsonparam, function (result){
+		// console.log(jsonparam);
+	}, "json");
+	
+	
 	var count = 0;
 	for(var i =0; i < texts.length; i++) {
 		if(texts[i].target != "")
 			count++;
 	}
-	$('#resultDiv').html(count + "/" + texts.length);
+	var statResult = count + "/" + texts.length  + " " + Math.floor((100*count)/texts.length) + "%";
+	$('#resultDiv').html(statResult );
 
+	var obj = {_docId: g_areaMap.getSrtId(), stats: statResult};
+	var jsonparam = {_doc: JSON.stringify(obj)};
+	ajaxPost("/_je/srt", jsonparam, function(result) { console.log(jsonparam);}, "json");
 }
 
 function onCalcStatsStart() {
 	notifyStatus("calc...", STATUS_STICK);
 	var srtId = $('#srtList option:selected')[0].value;
-	ajaxGet("/_je/text?cond=srtId.eq." + srtId, function (result) {
-		onTextsComming(result);
-		notifyStatus("done", STATUS_TIMED);
+	ajaxGet("/_je/areaMap", function (areaMaps) {
+		g_areaMapList =createAreaMapList(areaMaps);
+		g_areaMap = g_areaMapList.getMap(srtId);
+	
+		ajaxGet("/_je/text?cond=srtId.eq." + srtId, function (result) {
+			onTextsComming(result);
+			notifyStatus("done", STATUS_TIMED);
+		});
 	});
 }
 

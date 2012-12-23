@@ -181,7 +181,7 @@ function createAreaMap(json){
 		},
 		getTextNum: function() { return json["textNum"]; },
 		getAreaNum: function() {
-			return Math.floor(this.getTextNum() / TEXT_PER_AREA);
+			return 1+ Math.floor((this.getTextNum()-1) / TEXT_PER_AREA);
 		},
    };
 }
