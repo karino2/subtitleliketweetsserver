@@ -330,8 +330,8 @@ function onTextsComming(result) {
 			var newVal =targetTextArea.val();
 			submitText(par.attr("_docId"), par.find(".target").val(), function() {targetTextArea.attr("_server", newVal); targetTextArea.removeClass("dirty"); });
 		});
-		div.append(target);
 		div.append(original);
+		div.append(target);
 		div.append($('<div/>').addClass("span2").append(submit));
 		holder.append(div);		
 	}

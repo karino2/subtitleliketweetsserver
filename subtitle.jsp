@@ -134,7 +134,7 @@ function createAreaMap(json){
 		},
 		getTextNum: function() { return json["textNum"]; },
 		getAreaNum: function() {
-			return Math.floor(this.getTextNum() / TEXT_PER_AREA);
+			return 1+ Math.floor((this.getTextNum()-1) / TEXT_PER_AREA);
 		},
    };
 }
@@ -283,8 +283,8 @@ function onTextsComming(result) {
 			var newVal =targetTextArea.val();
 			submitText(par.attr("_docId"), par.find(".target").val(), function() {targetTextArea.attr("_server", newVal); targetTextArea.removeClass("dirty"); });
 		});
-		div.append(target);
 		div.append(original);
+		div.append(target);
 		div.append($('<div/>').addClass("span2").append(submit));
 		holder.append(div);		
 	}
